@@ -17,7 +17,7 @@ A modern web application built with [Vite](https://vitejs.dev/), [React](https:/
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/naumangoraya/sos.git
 cd sos
 ```
 
