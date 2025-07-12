@@ -110,6 +110,36 @@ const Header = ({ currentPage, onPageChange }) => {
             >
               Store Information
             </button>
+            <button
+              onClick={() => onPageChange('saleInvoice')}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                background: currentPage === 'saleInvoice' ? '#3498db' : 'transparent',
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Sale Invoice
+            </button>
+            <button
+              onClick={() => onPageChange('purchaseInvoice')}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                background: currentPage === 'purchaseInvoice' ? '#3498db' : 'transparent',
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Purchase Invoice
+            </button>
           </nav>
         </div>
         
