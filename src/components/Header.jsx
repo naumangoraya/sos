@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ currentPage, onPageChange }) => {
+const Header = ({ currentPage, onPageChange, user, onLogout }) => {
   const getPageTitle = () => {
     switch (currentPage) {
       case 'customer':
@@ -144,11 +144,46 @@ const Header = ({ currentPage, onPageChange }) => {
         </div>
         
         <div style={{
-          fontSize: '18px',
-          fontWeight: 'bold',
-          opacity: 0.9
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
         }}>
-          {/* No page title here, just highlight active nav button */}
+          {user && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              opacity: 0.9
+            }}>
+              <span>Welcome, {user.username}</span>
+              <span style={{
+                background: user.role === 'admin' ? '#e74c3c' : '#27ae60',
+                color: 'white',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                {user.role}
+              </span>
+            </div>
+          )}
+          <button
+            onClick={onLogout}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              background: '#e74c3c',
+              color: 'white',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </header>

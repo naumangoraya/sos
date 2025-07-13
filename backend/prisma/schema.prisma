@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("user") // admin, user
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  purchaseInvoices PurchaseInvoice[]
+  saleInvoices     SaleInvoice[]
+
+  @@map("users")
+}
+
+// Item information
+model Item {
+  itemId           String  @id @map("item_id")
+  description      String?
+  brand            String?
+  sheetsPerPacket  Int?    @map("sheets_per_packet")
+  width            Decimal? @db.Decimal(6, 2)
+  length           Decimal? @db.Decimal(6, 2)
+  grams            Int?
+  isConstant       Boolean @default(false) @map("is_constant")
+  type             String?
+
+  // Relations
+  purchaseInvoiceLineItems PurchaseInvoiceLineItem[]
+  saleInvoiceLineItems     SaleInvoiceLineItem[]
+
+  @@map("items")
+}
+
+// Store information
+model Store {
+  id          Int      @id @default(autoincrement())
+  storeName   String   @unique @map("store_name")
+  description String?
+  status      String   @default("Active")
+
+  // Relations
+  purchaseInvoices PurchaseInvoice[]
+  saleInvoices     SaleInvoice[]
+
+  @@map("stores")
+}
+
+// Customer information
+model Customer {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  title         String?
+  businessName  String?  @map("business_name")
+  contactPerson String?  @map("contact_person")
+  city          String?
+  address       String?
+  phoneNumber   String?  @map("phone_number")
+  email         String?
+  mobileNumber  String?  @map("mobile_number")
+  creditDays    Int      @default(0) @map("credit_days")
+  creditLimit   Decimal  @default(0) @db.Decimal(12, 2) @map("credit_limit")
+
+  // Relations
+  saleInvoices SaleInvoice[]
+
+  @@map("customers")
+}
+
+// Supplier information
+model Supplier {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  title         String?
+  businessName  String?  @map("business_name")
+  contactPerson String?  @map("contact_person")
+  city          String?
+  address       String?
+  phoneNumber   String?  @map("phone_number")
+  mobileNumber  String?  @map("mobile_number")
+  email         String?
+
+  // Relations
+  purchaseInvoices PurchaseInvoice[]
+
+  @@map("suppliers")
+}
+
+// Purchase invoice header
+model PurchaseInvoice {
+  id             Int      @id @default(autoincrement())
+  invoiceNumber  String   @unique @map("invoice_number")
+  invoiceDate    DateTime @map("invoice_date")
+  supplierId     Int      @map("supplier_id")
+  storeId        Int      @map("store_id")
+  referenceNumber String? @map("reference_number")
+  remarks        String?
+  totalAmount    Decimal  @default(0) @db.Decimal(12, 2) @map("total_amount")
+  status         String   @default("DRAFT")
+  createdBy      String?  @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+  user     User?    @relation(fields: [createdBy], references: [username])
+  lineItems PurchaseInvoiceLineItem[]
+
+  @@map("purchase_invoices")
+}
+
+// Purchase invoice line items
+model PurchaseInvoiceLineItem {
+  id           Int      @id @default(autoincrement())
+  invoiceId    Int      @map("invoice_id")
+  itemId       String   @map("item_id")
+  quantity     Int
+  weight       Decimal? @db.Decimal(8, 2)
+  rate         Decimal  @db.Decimal(10, 2)
+  value        Decimal  @db.Decimal(12, 2)
+  lineRemarks  String?  @map("line_remarks")
+  lineNumber   Int      @map("line_number")
+
+  // Relations
+  invoice PurchaseInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  item    Item           @relation(fields: [itemId], references: [itemId])
+
+  @@map("purchase_invoice_line_items")
+}
+
+// Sale invoice header
+model SaleInvoice {
+  id                Int      @id @default(autoincrement())
+  invoiceNumber     String   @unique @map("invoice_number")
+  invoiceDate       DateTime @map("invoice_date")
+  customerId        Int      @map("customer_id")
+  storeId           Int      @map("store_id")
+  paymentType       String   @default("Cash") @map("payment_type")
+  referenceNumber   String?  @map("reference_number")
+  deliveredTo       String?  @map("delivered_to")
+  deliveryAddress   String?  @map("delivery_address")
+  biltyNumber       String?  @map("bilty_number")
+  biltyDate         DateTime? @map("bilty_date")
+  ctn               String?
+  deliveredBy       String?  @map("delivered_by")
+  remarks           String?
+  totalAmount       Decimal  @default(0) @db.Decimal(12, 2) @map("total_amount")
+  discountPercentage Decimal @default(0) @db.Decimal(5, 2) @map("discount_percentage")
+  discountAmount    Decimal  @default(0) @db.Decimal(12, 2) @map("discount_amount")
+  freightCharges    Decimal  @default(0) @db.Decimal(10, 2) @map("freight_charges")
+  labourCharges     Decimal  @default(0) @db.Decimal(10, 2) @map("labour_charges")
+  netAmount         Decimal  @default(0) @db.Decimal(12, 2) @map("net_amount")
+  receivedAmount    Decimal  @default(0) @db.Decimal(12, 2) @map("received_amount")
+  balanceAmount     Decimal  @default(0) @db.Decimal(12, 2) @map("balance_amount")
+  totalWeight       Decimal  @default(0) @db.Decimal(10, 3) @map("total_weight")
+  status            String   @default("DRAFT")
+  createdBy         String?  @map("created_by")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  customer  Customer @relation(fields: [customerId], references: [id])
+  store     Store    @relation(fields: [storeId], references: [id])
+  user      User?    @relation(fields: [createdBy], references: [username])
+  lineItems SaleInvoiceLineItem[]
+
+  @@map("sale_invoices")
+}
+
+// Sale invoice line items
+model SaleInvoiceLineItem {
+  id            Int      @id @default(autoincrement())
+  invoiceId     Int      @map("invoice_id")
+  itemId        String   @map("item_id")
+  reelNumber    String?  @map("reel_number")
+  quantity      Int
+  weight        Decimal? @db.Decimal(10, 3)
+  rate          Decimal  @db.Decimal(10, 2)
+  rateOn        String   @default("Weight") @map("rate_on")
+  value         Decimal? @db.Decimal(12, 2)
+  pktRate       Decimal? @db.Decimal(10, 2) @map("pkt_rate")
+  stockQuantity Int      @default(0) @map("stock_quantity")
+  lineRemarks   String?  @map("line_remarks")
+  lineNumber    Int      @map("line_number")
+
+  // Relations
+  invoice SaleInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  item    Item        @relation(fields: [itemId], references: [itemId])
+
+  @@map("sale_invoice_line_items")
+} 

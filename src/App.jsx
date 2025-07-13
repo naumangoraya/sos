@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header';
+import Login from './components/Login';
 import CustomerInformation from './components/CustomerInformation';
 import ItemInformation from './components/ItemInformation';
 import SupplierInformation from './components/SupplierInformation';
 import StoreInformation from './components/StoreInformation';
 import SaleInvoice from './components/SaleInvoice';
 import PurchaseInvoice from './components/PurchaseInvoice';
+import { isAuthenticated, getCurrentUser, logout } from './services/api.js';
 
 const sidebarItems = [
   { label: 'Product', page: 'product' },
@@ -27,6 +29,30 @@ const sidebarItems = [
 
 function App() {
   const [page, setPage] = useState('customer');
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setAuthenticated(true);
+      setUser(getCurrentUser());
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    setAuthenticated(true);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setAuthenticated(false);
+    setUser(null);
+  };
+
+  if (!authenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div style={{ display: 'flex', height: '100vh', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
@@ -57,8 +83,8 @@ function App() {
       
       {/* Main Content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 180 }}>
-        {/* Header */}
-        <Header currentPage={page} onPageChange={setPage} />
+              {/* Header */}
+      <Header currentPage={page} onPageChange={setPage} user={user} onLogout={handleLogout} />
         {/* Page Content */}
         <div style={{ marginTop: 80 }}> {/* Add top margin to account for fixed header */}
           {page === 'customer' ? <CustomerInformation /> :
