@@ -42,7 +42,7 @@ A comprehensive invoice management system built with React frontend and Node.js/
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/naumangoraya/sos.git
 cd sos
 
 # Run the setup script (optional)
