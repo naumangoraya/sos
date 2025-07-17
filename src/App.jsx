@@ -28,7 +28,8 @@ const sidebarItems = [
 ];
 
 function App() {
-  const [page, setPage] = useState('customer');
+  // Set initial page from localStorage, fallback to 'customer'
+  const [page, setPage] = useState(() => localStorage.getItem('currentPage') || 'customer');
   const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -38,6 +39,11 @@ function App() {
       setUser(getCurrentUser());
     }
   }, []);
+
+  // Save current page to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('currentPage', page);
+  }, [page]);
 
   const handleLogin = (userData) => {
     setAuthenticated(true);
@@ -88,7 +94,7 @@ function App() {
         {/* Page Content */}
         <div style={{ marginTop: 80 }}> {/* Add top margin to account for fixed header */}
           {page === 'customer' ? <CustomerInformation /> :
-           page === 'item' ? <ItemInformation /> :
+           page === 'product' || page === 'item' ? <ItemInformation /> :
            page === 'supplier' ? <SupplierInformation /> :
            page === 'store' ? <StoreInformation /> :
            page === 'saleInvoice' ? <SaleInvoice /> :
