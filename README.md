@@ -404,3 +404,48 @@ For support or questions, please open an issue in the repository.
 ---
 
 **Built with ❤️ using React, Node.js, Express, PostgreSQL, and Prisma**
+
+---
+
+## Running with Docker (Recommended for Easy Setup)
+
+You can run the entire project (frontend, backend, and Postgres database) with a single command using Docker. No local Node.js or Postgres installation is required.
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed
+
+### Steps
+
+1. **Clone the Repository**
+   ```sh
+   git clone <your-repo-url>
+   cd <your-repo-folder>
+   ```
+
+2. **Start the Project**
+   ```sh
+   docker-compose up
+   ```
+   - The first run will take a few minutes (downloads images, installs dependencies).
+   - Next runs will be much faster.
+
+3. **Access the App**
+   - Frontend: [http://localhost:5173](http://localhost:5173)
+   - Backend API: [http://localhost:5000/api](http://localhost:5000/api)
+   - Postgres: localhost:5432 (user: `sos`, password: `sos`, db: `sos`)
+
+4. **Develop with Hot Reload**
+   - Any code change in `src/` (frontend) or `backend/` (backend) is instantly reflected in your browser.
+   - No need to rebuild or restart Docker containers for code changes.
+
+5. **Stop the Project**
+   ```sh
+   docker-compose down
+   ```
+
+---
+
+**Note:**
+- Database data is persisted in a Docker volume (`pgdata`), so your data is safe between restarts.
+- No `.env` files are needed for local dev; all secrets are in `docker-compose.yml`.
+- For production, you can create a separate `docker-compose.prod.yml` and production Dockerfiles.
